@@ -1,43 +1,71 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reports</title>
-<link rel="stylesheet" href="styles.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reports</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* small page-specific adjustments for a very simple, focused reports page */
+    .reports-grid{max-width:900px;margin:20px auto;display:grid;grid-template-columns:1fr;gap:14px;padding:0 14px}
+    .summary-row{display:flex;gap:12px;flex-wrap:wrap}
+    .summary-card{flex:1;min-width:180px;background:#fff;padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+    .summary-label{color:#6b7280;font-size:13px}
+    .summary-value{font-weight:700;font-size:20px;margin-top:6px}
+    .chart-card{background:#fff;padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+    .no-data { color: #6b7280; padding:12px; text-align:center; }
+  </style>
 </head>
 <body>
-<header class="topbar">
-<div class="brand">Expense Tracker</div>
-<nav class="topnav">
-<a href="index.html">Home</a>
-<a href="transactions.html">Transactions</a>
-<a href="budgets.html">Budgets</a>
-<a href="reports.html" class="active">Reports</a>
-<a href="import.html">Import/Export</a>
-</nav>
-</header>
+  <header class="topbar">
+    <div class="brand">Expense Tracker</div>
+    <nav class="topnav">
+      <a href="index.html">Home</a>
+      <a href="transactions.html">Transactions</a>
+      <a href="budgets.html">Budgets</a>
+      <a href="reports.html" class="active">Reports</a>
+      <a href="import.html">Import/Export</a>
+    </nav>
+  </header>
 
+  <main class="reports-grid">
+    <section class="summary-row">
+      <div class="summary-card">
+        <div class="summary-label">Total Balance</div>
+        <div id="rpTotal" class="summary-value">₹0.00</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">This Month — Income</div>
+        <div id="rpIncome" class="summary-value">₹0.00</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">This Month — Expense</div>
+        <div id="rpExpense" class="summary-value">₹0.00</div>
+      </div>
+    </section>
 
-<main class="container">
-<section class="card">
-<h2>Reports</h2>
-<div style="display:flex;gap:20px;flex-wrap:wrap">
-<div style="flex:1;min-width:320px">
-<h4>Spending by Category</h4>
-<canvas id="pie"></canvas>
-</div>
-<div style="flex:1;min-width:320px">
-<h4>Monthly Income vs Expense</h4>
-<canvas id="bar"></canvas>
-</div>
-</div>
-</section>
-</main>
+    <section class="chart-card">
+      <h4 style="margin:0 0 8px 0">Spending by Category</h4>
+      <div style="min-height:220px">
+        <canvas id="pie"></canvas>
+      </div>
+    </section>
 
+    <section class="chart-card">
+      <h4 style="margin:0 0 8px 0">Last 6 Months — Income vs Expenses</h4>
+      <div style="min-height:240px">
+        <canvas id="bar"></canvas>
+      </div>
+    </section>
 
-<script src="common.js"></script>
-<script src="reports.js"></script>
+    <section class="chart-card">
+      <h4 style="margin:0 0 8px 0">Recent Transactions (latest 6)</h4>
+      <div id="recentList" style="min-height:60px;"></div>
+    </section>
+  </main>
+
+  <script src="common.js"></script>
+  <script src="reports.js"></script>
 </body>
 </html>
