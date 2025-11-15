@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reports</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<header class="topbar">
+<div class="brand">Expense Tracker</div>
+<nav class="topnav">
+<a href="index.html">Home</a>
+<a href="transactions.html">Transactions</a>
+<a href="budgets.html">Budgets</a>
+<a href="reports.html" class="active">Reports</a>
+<a href="import.html">Import/Export</a>
+</nav>
+</header>
+
+
+<main class="container">
+<section class="card">
+<h2>Reports</h2>
+<div style="display:flex;gap:20px;flex-wrap:wrap">
+<div style="flex:1;min-width:320px">
+<h4>Spending by Category</h4>
+<canvas id="pie"></canvas>
+</div>
+<div style="flex:1;min-width:320px">
+<h4>Monthly Income vs Expense</h4>
+<canvas id="bar"></canvas>
+</div>
+</div>
+</section>
+</main>
+
+
+<script src="common.js"></script>
+<script src="reports.js"></script>
+</body>
+</html>

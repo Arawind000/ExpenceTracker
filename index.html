@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">Expense Tracker</div>
+        <nav class="topnav">
+            <a href="index.html">Home</a>
+            <a href="transactions.html">Transactions</a>
+            <a href="budgets.html">Budgets</a>
+            <a href="reports.html">Reports</a>
+            <a href="import.html">Import/Export</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2>Welcome</h2>
+            <p>This is a local demo. You can set your <strong>Starting Balance</strong> below — the app will use it to compute the total balance.</p>
+            <div class="form-row">
+                <label>Starting Balance</label>
+                <input id="startingInput" type="number" step="0.01" placeholder="0.00">
+                <button id="saveStarting" class="btn">Save</button>
+            </div>
+            <div class="kpis">
+                <div class="kpi">
+                    <div class="kpi-label">Total Balance</div>
+                    <div id="totalBalance" class="kpi-value">₹0.00</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-label">This Month Income</div>
+                    <div id="monthIncome" class="kpi-value">₹0.00</div>
+                </div>
+                <div class="kpi">
+                    <div class="kpi-label">This Month Expense</div>
+                    <div id="monthExpense" class="kpi-value">₹0.00</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h3>Quick Actions</h3>
+            <div class="actions">
+                <a href="transactions.html" class="btn">Add / View Transactions</a>
+                <a href="budgets.html" class="btn btn-ghost">Budgets</a>
+                <a href="reports.html" class="btn btn-ghost">Reports</a>
+            </div>
+        </section>
+    </main>
+
+    <script src="common.js"></script>
+    <script>
+      // home page initial render + reactive updates
+      function renderHome(){
+        const s = loadState();
+        document.getElementById('startingInput').value = s.startingBalance || 0;
+        document.getElementById('totalBalance').textContent = formatCurrency(calculateTotal());
+        const mm = monthSummary();
+        document.getElementById('monthIncome').textContent = formatCurrency(mm.income);
+        document.getElementById('monthExpense').textContent = formatCurrency(mm.expense);
+      }
+    
+      document.getElementById('saveStarting').addEventListener('click', ()=>{
+        const v = Number(document.getElementById('startingInput').value) || 0;
+        saveStartingBalance(v);
+        // saveStartingBalance calls saveState which dispatches stateChanged
+        // but do immediate render too
+        renderHome();
+        alert('Starting balance saved');
+      });
+    
+      // initial render
+      renderHome();
+    
+      // re-render when state changes in same tab
+      window.addEventListener('stateChanged', ()=> renderHome());
+    
+      // also catch storage changes from other tabs/windows
+      window.addEventListener('storage', (e) => {
+        if(e.key === STORAGE_KEY || e.key === null) renderHome();
+      });
+    </script>
+    
+</body>
+</html>

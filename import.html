@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Import / Export</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Expense Tracker</div>
+    <nav class="topnav">
+      <a href="index.html">Home</a>
+      <a href="transactions.html">Transactions</a>
+      <a href="budgets.html">Budgets</a>
+      <a href="reports.html">Reports</a>
+      <a href="import.html" class="active">Import/Export</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Backup / Restore</h2>
+      <p>Export a JSON backup or import to restore/replace local data.</p>
+      <div class="form-row">
+        <button id="exportBtn" class="btn">Export JSON</button>
+        <input id="fileInput" type="file" accept="application/json" style="display:none">
+        <button id="importBtn" class="btn btn-ghost">Import JSON</button>
+      </div>
+      <div style="margin-top:12px;color:var(--muted)">Note: Import replaces local data.</div>
+    </section>
+  </main>
+
+  <script src="common.js"></script>
+  <script src="import.js"></script>
+</body>
+</html>
