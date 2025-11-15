@@ -434,4 +434,119 @@ window.spentForCategoryThisMonth = spentForCategoryThisMonth;
     init();
   
   })();
-  
+
+  // reports.js - simple, focused reports UI and charts (re-renders on state change)
+(function(){
+  function ready(fn){
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+
+  ready(() => {
+    const pieEl = document.getElementById('pie');
+    const barEl = document.getElementById('bar');
+    const rpTotal = document.getElementById('rpTotal');
+    const rpIncome = document.getElementById('rpIncome');
+    const rpExpense = document.getElementById('rpExpense');
+    const recentList = document.getElementById('recentList');
+
+    if(!pieEl || !barEl || !rpTotal) {
+      console.error('reports.js: missing DOM nodes');
+      return;
+    }
+
+    let pieChart = null;
+    let barChart = null;
+
+    function build(){
+      const s = loadState();
+
+      // totals
+      const total = calculateTotal();
+      const month = monthSummary();
+
+      // pie: expense by category
+      const expenses = (s.transactions || []).filter(t => t.type === 'expense');
+      const sums = {};
+      expenses.forEach(e => { const key = e.category || 'Uncategorized'; sums[key] = (sums[key]||0) + Number(e.amount || 0); });
+
+      const pieLabels = Object.keys(sums);
+      const pieData = Object.values(sums);
+
+      // bar: last 6 months
+      const months = {};
+      (s.transactions || []).forEach(t => {
+        if(!t.date) return;
+        const m = t.date.slice(0,7);
+        months[m] = months[m] || {inc:0,exp:0};
+        if(t.type === 'income') months[m].inc += Number(t.amount || 0);
+        else months[m].exp += Number(t.amount || 0);
+      });
+      const sorted = Object.keys(months).sort();
+      const last = sorted.slice(Math.max(0, sorted.length - 6));
+      const inc = last.map(k => months[k].inc);
+      const exp = last.map(k => months[k].exp);
+
+      return { total, month, pieLabels, pieData, last, inc, exp, recent: (s.transactions||[]).slice(-6).reverse() };
+    }
+
+    function render(){
+      const d = build();
+
+      // update simple values
+      rpTotal.textContent = formatCurrency(d.total);
+      rpIncome.textContent = formatCurrency(d.month.income);
+      rpExpense.textContent = formatCurrency(d.month.expense);
+
+      // recent list
+      if(d.recent.length === 0){
+        recentList.innerHTML = '<div class="no-data">No transactions yet</div>';
+      } else {
+        recentList.innerHTML = d.recent.map(t => {
+          const amt = t.type === 'income' ? formatCurrency(t.amount) : '-' + formatCurrency(t.amount);
+          return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9"><div><div style="font-weight:600">${t.category||'--'}</div><div class="small">${t.date} • ${t.notes || ''}</div></div><div style="font-weight:700">${amt}</div></div>`;
+        }).join('');
+      }
+
+      // pie chart
+      if(pieChart) { pieChart.destroy(); pieChart = null; }
+      const pieCfg = {
+        type: 'doughnut',
+        data: {
+          labels: d.pieLabels.length ? d.pieLabels : ['No data'],
+          datasets: [{ data: d.pieData.length ? d.pieData : [1], backgroundColor: palette(Math.max(d.pieData.length,1)) }]
+        },
+        options: { maintainAspectRatio:false, plugins:{legend:{position:'right'}} }
+      };
+      pieChart = new Chart(pieEl, pieCfg);
+
+      // bar chart
+      if(barChart) { barChart.destroy(); barChart = null; }
+      const barCfg = {
+        type: 'bar',
+        data: {
+          labels: d.last.length ? d.last : ['No months'],
+          datasets: [
+            { label:'Income', data: d.last.length ? d.inc : [0], backgroundColor:'#60a5fa' },
+            { label:'Expenses', data: d.last.length ? d.exp : [0], backgroundColor:'#ef4444' }
+          ]
+        },
+        options: { maintainAspectRatio:false, scales:{ y:{ beginAtZero:true } } }
+      };
+      barChart = new Chart(barEl, barCfg);
+    }
+
+    function palette(n){
+      const p = ['#60a5fa','#f97316','#f43f5e','#a78bfa','#34d399','#fbbf24','#fb7185','#60c4b6'];
+      const out = [];
+      for(let i=0;i<n;i++) out.push(p[i%p.length]);
+      return out;
+    }
+
+    // initial render & reactive updates
+    render();
+    window.addEventListener('stateChanged', render);
+    window.addEventListener('storage', (e) => { if(e.key === STORAGE_KEY || e.key === null) render(); });
+
+  });
+})();
